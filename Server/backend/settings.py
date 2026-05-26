@@ -57,6 +57,14 @@ REST_FRAMEWORK = {
     ),
 }
 
+JWT_SECRET = config("JWT_SECRET")
+JWT_ALGORITHM = config("JWT_ALGORITHM")
+JWT_EXP_DELTA_SECONDS = config(
+    'JWT_EXP_DELTA_SECONDS',
+    default=60 * 60 * 24 * 365,
+    cast=int
+)
+
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
 
