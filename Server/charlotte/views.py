@@ -50,3 +50,40 @@ def create_user(request):
     else: 
         return JsonResponse({'error' : 'Only POST method allowed'}, status=405)
 
+#Log in user
+@csrf_exempt
+def login_user(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            input_username = data.get('username')
+            input_password = data.get('password')
+
+            if (not input_username) or (not input_password):
+                return JsonResponse({ 'error' : 'Please provide User Name and Password'}, status=400)
+
+            try:
+                found_user = User.objects.get(username = input_username)
+            except User.DoesNotExist:
+                return JsonResponse({'error' : 'Incorrect User Name'}, status=404)
+
+            if not check_password(input_password, found_user.password):
+                return JsonResponse({'error' : 'Password incorrect'}, status=401)
+            
+            payload = {
+                'user_id' : found_user.id,
+                'username' : found_user.username,
+                'exp' : datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(seconds=settings.JWT_EXP_DELTA_SECONDS)
+            }
+            token = jwt.encode(payload, settings.JWT_SECRET, algorithm=settings.JWT_ALGORITHM)
+
+            return JsonResponse({'message' : 'User Logged in Successfully', 'token' : token}, status=200)
+        
+        except json.JSONDecodeError:
+            return JsonResponse({'error' : 'Invalid JSON'}, status=400)
+        except Exception as e:
+            return JsonResponse({'error' : str(e)}, status=500)
+
+    else: 
+        return JsonResponse({'error' : 'Only POST method allowed'}, status=405)
+    
