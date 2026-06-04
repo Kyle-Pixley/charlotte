@@ -25,7 +25,7 @@ class ChatRoom(models.Model):
 
 class Message(models.Model):
     sender = models.ForeignKey(
-        user,
+        User,
         on_delete=models.CASCADE,
         related_name="sent_messages"
     )
