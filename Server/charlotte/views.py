@@ -119,3 +119,31 @@ def find_user_id(request):
 
     else:
         return JsonResponse({'error' : 'Only POST method allowed'}, status=405)
+
+# Find user by username
+@csrf_exempt
+def find_username(request):
+    if request.method == "POST":
+        try: 
+            data = json.loads(request.body)
+            input_username = data.get('username')
+
+            if not input_username:
+                return JsonResponse({'error' : 'Please Provide Username'}, status=400)
+
+            matched_users = User.objects.filter(username__icontains=input_username).order_by('username')[:5]
+
+            if not matched_users.exists():
+                return JsonResponse({'error' : 'No users found'}, status=404)
+
+            user_data = [{'id' : user.id, 'username' : user.username} for user in matched_users]
+
+            return JsonResponse({'message' : 'Users found', 'data' : user_data}, status=200)
+        
+        except json.JSONDecodeError:
+            return JsonResponse({'error' : 'Invalid JSON'}, status=400)
+        except Exception as e:
+            return JsonResponse({'error' : str(e)}, status=500)
+
+    else:
+        return JsonResponse({'error' : 'Only POST method allowed'}, status=405)
