@@ -13,15 +13,47 @@ class User(models.Model):
     def __str__(self):
         return self.username
 
+
 class ChatRoom(models.Model):
     name = models.CharField(max_length=100, blank=True, null=True)
-    participants = models.ManyToManyField(User, related_name="chatrooms")
+
+    admin = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="admin_chatrooms")
+
+    participants = models.ManyToManyField(
+        User, 
+        related_name="chatrooms")
+
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         if self.name:
             return self.name
         return f"ChatRoom {self.id}"
+
+class ChatRoomJoinRequest(models.Model):
+    chatroom = models.ForeignKey(
+        ChatRoom,
+        on_delete=models.CASCADE,
+        related_name="join_requests"
+    )
+
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="chatroom_join_requests"
+    )
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ("chatroom", "user")
+
+    def __str__(self):
+        return f"{self.user.username} wants to join {self.chatroom}"
+
 
 class Message(models.Model):
     sender = models.ForeignKey(

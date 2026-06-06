@@ -11,7 +11,7 @@ from django.contrib.auth.hashers import make_password
 from django.contrib.auth.hashers import check_password
 import jwt
 import datetime
-from .models import User
+from .models import User, ChatRoom, ChatRoomJoinRequest, Message
 
 @api_view(["GET"])
 def test_api(request):
@@ -147,3 +147,132 @@ def find_username(request):
 
     else:
         return JsonResponse({'error' : 'Only POST method allowed'}, status=405)
+
+#Create New Chat Room 
+@csrf_exempt
+def create_chatroom(request):
+    if request.method != "POST":
+        return JsonResponse({"error" : "Post request Only"}, status=405)
+
+    try:
+        data = json=loads(request.body)
+        name = data.get("name")
+        admin_id = data.get("admin_id")
+
+        if not adming_id:
+            return JsonResponse({"error" : "admin_id is required"}, status=400)
+
+        try:
+            admin = User.objects.get(id=admin_id)
+        except User.DoesNotExist:
+            return JsonResponse({"error" : 'Admin user does not exist'}, status=404)
+
+        chatroom = ChatRoom.objects.create(
+            name=name,
+            admin=admin
+        )
+
+        chatroom.participants.add(admin)
+
+        return JsonResponse({
+            "message" : 'Chatroom created',
+            "chatroom" : {
+                "id" : chatroom.id,
+                "name" : chatroom.name,
+                "admin_id" : chatroom.admin.id,
+                "participants" : list(chatroom.participants.values_list("id", flat=True)),
+                "created_at" : chatroom.created_at,
+            }
+        }, status=201)
+        
+    except json.JSONDecodeError:
+        return JsonResponse({"error" : "Invalid JSON"}, status=400)
+
+#Create Request To Join Room 
+@csrf_exempt
+def request_to_join_chatroom(request):
+    if request.method != "POST":
+        return JsonResponse({"Error" : "POST method only"}, status=405)
+
+    try: 
+        data = json.loads(request.body)
+
+        user_id = data.get("user_id")
+        chatroom_id = data.get("chatroom_id")
+
+        if not user_id or not chatroom_id:
+            return JsonResponse({"error" : "missing user_id and or chatroom_id"}, status=400)
+        
+        try:
+            user = User.objects.get(id=user_id)
+        except User.DoesNotExist:
+            return JsonResponse({"error":"user does not exist"}, status=404)
+
+        try:
+            chatroom = ChatRoom.objects.get(id=chatroom_id)
+        except ChatRoom.DoesNotExist:
+            return JsonResponse({"error" : "Chatrrom does not exist"}, status=404)
+        
+        if chatroom.participants.filter(id=user.id).exist():
+            return JsonResponse({'error' : "user already participant"}, status=400)
+        
+        join_request, created = ChatRoomJoinRequest.objects.get_or_create(
+            chatroom=chatroom,
+            user=user
+        )
+
+        if not created:
+            return JsonResponse({"error" : 'join request already exists'}, status=400)
+
+        return JsonResponse({
+            "message" : "Join request sent",
+            "request" : {
+                "id" : join_request.id,
+                "chatroom_id" : chatroom.id,
+                "user_id" : user.id,
+                "username" : user.username,
+                "created_at" : join_request.created_at,
+            }
+        }, status=201)
+
+    except json.JSONDecodeError:
+        return JsonResponse({"error" : "invalid JSON"}, status=400)
+
+#admin approves a join request
+@csrf_exempt
+def approve_join_request(request):
+    if request.method != "POST":
+        return JsonResponse({"error":"POST method only"}, status=405)
+
+    try:
+        data = json.loads(request.body)
+
+        admin_id = data. get("admin_id")
+        request_id = data.get("request_id")
+
+        if not admin_id or not request_id:
+            return JsonResponse({"error" : "admin_id and request_id ar required"}, status=400)
+
+        try: 
+            join_request = ChatRoomJoinRequest.objects.get(id=request_id)
+        except ChatRoomJoinRequest.DoesNotExist:
+            return JsonResponse({"error" : "Join request does not exist"}, status=404)
+
+        chatroom = join_request.chatroom
+
+        if chatroom.admin.id != admin_id:
+            return JsonResponse({"error" : "Only the riim admin can approve requests"}, status=403)
+        
+        chatroom.participants.add(join_request.user)
+
+        join_request.delete()
+
+        return JsonResponse({
+            "message" : "Join request granted",
+            "chatroom_id" : chatroom.id,
+            "added_user_id" : join_request.user.id,
+        }, status=200)
+
+    except json.JSONDecodeError:
+        return JsonResponse({"error" : "invalid JSON"}, status+400)
+
