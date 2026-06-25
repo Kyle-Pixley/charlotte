@@ -1,12 +1,13 @@
-import React ,{useState, useEffect}from 'react';
-import { Text, View } from "react-native";
+import React from 'react';
+import { StyleSheet, Text, View } from 'react-native';
+
 
 function DashBoard() {
   return (
     <View>
-        <Text>Dashboard</Text>
+        <Text>Hello Baby</Text>
     </View>
   )
 }
 
-export default DashBoard;
+export default DashBoard
