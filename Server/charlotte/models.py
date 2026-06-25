@@ -22,6 +22,7 @@ class ChatRoom(models.Model):
         on_delete=models.CASCADE,
         related_name="admin_chatrooms")
 
+
     participants = models.ManyToManyField(
         User, 
         related_name="chatrooms")
@@ -79,6 +80,7 @@ class Message(models.Model):
     )
 
     is_read = models.BooleanField(default=False)
+    is_system_message = models.BooleanField(default=False)
     body = models.TextField()
     timestamp = models.DateTimeField(auto_now_add=True)
 

@@ -155,11 +155,12 @@ def create_chatroom(request):
         return JsonResponse({"error" : "Post request Only"}, status=405)
 
     try:
-        data = json=loads(request.body)
+        data = json.loads(request.body)
         name = data.get("name")
         admin_id = data.get("admin_id")
+        
 
-        if not adming_id:
+        if not admin_id:
             return JsonResponse({"error" : "admin_id is required"}, status=400)
 
         try:
@@ -213,7 +214,7 @@ def request_to_join_chatroom(request):
         except ChatRoom.DoesNotExist:
             return JsonResponse({"error" : "Chatrrom does not exist"}, status=404)
         
-        if chatroom.participants.filter(id=user.id).exist():
+        if chatroom.participants.filter(id=user.id).exists():
             return JsonResponse({'error' : "user already participant"}, status=400)
         
         join_request, created = ChatRoomJoinRequest.objects.get_or_create(
@@ -250,6 +251,7 @@ def approve_join_request(request):
         admin_id = data. get("admin_id")
         request_id = data.get("request_id")
 
+
         if not admin_id or not request_id:
             return JsonResponse({"error" : "admin_id and request_id ar required"}, status=400)
 
@@ -260,10 +262,22 @@ def approve_join_request(request):
 
         chatroom = join_request.chatroom
 
+        user_joining = ChatRoomJoinRequest.objects.get(id=request_id)
+
+        user_joining = join_request.user.username
+
         if chatroom.admin.id != admin_id:
-            return JsonResponse({"error" : "Only the riim admin can approve requests"}, status=403)
+            return JsonResponse({"error" : "Only the room admin can approve requests"}, status=403)
         
         chatroom.participants.add(join_request.user)
+
+        system_message = Message.objects.create(
+            sender=chatroom.admin,
+            receiver=None,
+            chatroom=chatroom,
+            body =f"{user_joining} has joined the group",
+            is_system_message=True
+        )
 
         join_request.delete()
 
@@ -271,8 +285,65 @@ def approve_join_request(request):
             "message" : "Join request granted",
             "chatroom_id" : chatroom.id,
             "added_user_id" : join_request.user.id,
+            "system_message" : {
+                "id" : system_message.id,
+                "body" : system_message.is_system_message,
+                "timestamp" : system_message.timestamp,
+            }
         }, status=200)
 
     except json.JSONDecodeError:
-        return JsonResponse({"error" : "invalid JSON"}, status+400)
+        return JsonResponse({"error" : "invalid JSON"}, status=400)
 
+
+#Create Message For ChatRoom
+@csrf_exempt
+def create_room_message(request):
+    if request.method != "POST":
+        return JsonResponse({"Error request must be POST"})
+    
+    try:
+        data = json.loads(request.body)
+
+        sender_id = data.get("sender_id")
+        chatroom_id = data.get("chatroom_id")
+        body = data.get("body")
+
+        if not sender_id or not chatroom_id or not body:
+            return JsonResponse({"error" : "sender_id, chatroom_id, and body required"}, status=400)
+
+        try : 
+            sender = User.objects.get(id=sender_id)
+        except User.DoesNotExist:
+            return JsonResponse({"error" : "Sender does not exist"}, status=404)
+
+        try:
+            chatroom = ChatRoom.objects.get(id=chatroom_id)
+        except ChatRoom.DoesNotExist:
+            return JsonResponse({"error" : "chatroom does not exist"}, status=404)
+
+        if not chatroom.participants.filter(id=sender.id).exists():
+            return JsonResponse({"error" : "user not included in room"},status=403)
+
+        message = Message.objects.create(
+            sender=sender,
+            receiver=None,
+            chatroom=chatroom,
+            body=body,
+            is_system_message=False
+        )
+        return JsonResponse({
+            "message" : "Room message created",
+            "room_message": {
+                "id" : message.id,
+                "sender_id" : message.sender_id,
+                "sender_username" : message.sender.username,
+                "chatroom_id" : message.chatroom_id,
+                "body" : message.body,
+                "is_system_message" : message.is_system_message,
+                "timestamp" : message.timestamp
+            }
+         }, status=201)
+
+    except json.JSONDecodeError:
+        return JsonResponse({"error":"Invalid JSON"}, status=400)
