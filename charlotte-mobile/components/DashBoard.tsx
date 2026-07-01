@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import MenuList from './MenuList';
 import ContentBox from './ContentBox';
+import AppText from './AppText';
 import { SafeAreaView } from "react-native-safe-area-context";
 
 

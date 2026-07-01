@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
+import AppText from './AppText';
 
 function ContentBox() {
   return (
     <View style={styles.mainView}>
-      <Text>ContentBox</Text>
+      <AppText>ContentBox</AppText>
     </View>
   )
 }
