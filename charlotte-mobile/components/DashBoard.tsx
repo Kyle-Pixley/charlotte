@@ -1,24 +1,40 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import MenuList from './MenuList';
 import ContentBox from './ContentBox';
-import AppText from './AppText';
 import { SafeAreaView } from "react-native-safe-area-context";
+import Animated, {useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
 
 
 function DashBoard() {
 
   const [ menuList, setMenuList ] = useState(false);
 
+  const scale = useSharedValue(1);
+  const animatedStyle = useAnimatedStyle(() => {
+    return {
+      transform: [{ scale: scale.value}]
+    }
+  })
+
   return (
     <SafeAreaView style={styles.background}>
       <View style={styles.mainView}>
         <View>
-          {menuList ? <MenuList/> : null}
+          <MenuList isOpen={menuList} />
           <Pressable 
             onPress={()=> setMenuList(!menuList)}
+            onPressIn={() => {
+              scale.value = withTiming(0.9, {duration: 100})
+            }}
+            onPressOut={() => {
+              scale.value = withTiming(1, { duration: 100 })
+            }}
             style={[styles.menu, styles.menuButton]}>
-            <Text style={styles.text}>PP</Text>
+            <Animated.View style={[styles.menuButton, animatedStyle]}>
+              <Text style={styles.text}>PP</Text>
+            </Animated.View>
+
           </Pressable>
           <Text style={styles.header}>Charlotte</Text>
         </View>
@@ -53,6 +69,13 @@ const styles = StyleSheet.create({
     top: 0, 
     left: 0,
     zIndex: 33,
+  },
+  button: {
+    width: 44,
+    height: 44,
+    backgroundColor: "#FDA50F",
+    alignItems: "center",
+    justifyContent: "center",
   },
   header: {
     position: 'relative',

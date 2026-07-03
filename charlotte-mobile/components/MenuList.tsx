@@ -1,12 +1,32 @@
 import React, { useEffect, useState } from 'react';
 import AppText from './AppText';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
+import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 
-function MenuList() {
+type MenuListProps = {
+  isOpen: boolean;
+};
+
+
+function MenuList({isOpen} : MenuListProps) {
+  const slideX = useSharedValue(-330);
+
+  useEffect(() => {
+    slideX.value = withTiming(isOpen ? 0 : -330, {duration: 250});
+  }, [isOpen]);
+
+  const animatedStyle = useAnimatedStyle(() => {
+    return {
+      transform: [{ translateX: slideX.value }],
+    }
+  });
+
+
+
   return (
-    <View style={styles.menulist}>
+    <Animated.View style={[styles.menulist, animatedStyle]}>
         <AppText>Menu List</AppText>
-    </View>
+    </Animated.View>
   )
 }
 
