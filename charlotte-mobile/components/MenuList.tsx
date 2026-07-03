@@ -3,10 +3,7 @@ import AppText from './AppText';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 
-type MenuListProps = {
-  isOpen: boolean;
-};
-
+type MenuListProps = { isOpen: boolean };
 
 function MenuList({isOpen} : MenuListProps) {
   const slideX = useSharedValue(-330);

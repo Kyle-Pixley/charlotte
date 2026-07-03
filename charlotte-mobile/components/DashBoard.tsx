@@ -49,9 +49,9 @@ function DashBoard() {
 const styles = StyleSheet.create({
   background: {
     backgroundColor: '#C0C0D8',
-    height: '100%',
-    width: '100%',
+    flex: 1,
     padding: 6,
+    alignSelf: 'stretch',
   },
   mainView: {
     padding: 0,
@@ -74,8 +74,7 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     backgroundColor: "#FDA50F",
-    alignItems: "center",
-    justifyContent: "center",
+    
   },
   header: {
     position: 'relative',
@@ -86,10 +85,10 @@ const styles = StyleSheet.create({
   text: {
     color: '#023020',
     fontSize: 44,
-    transform: [{ translateY: 2 }, {translateX: 2}],
+    transform: [{ translateY: 3 }, {translateX: 2}],
   },
   content: {
-    borderBlockColor: '#960018',
+    borderColor: '#960018',
     position: 'absolute',
     top: 44,
     height: '90%',
