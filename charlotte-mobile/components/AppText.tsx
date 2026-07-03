@@ -11,7 +11,7 @@ function AppText({style, children, ...props}: TextProps) {
 const styles = StyleSheet.create({
     text: {
         color: '#023020',
-        fontSize: 66,
+        fontSize: 44,
     }
 })
 
