@@ -32,7 +32,7 @@ function DashBoard() {
             }}
             style={[styles.menu, styles.menuButton]}>
             <Animated.View style={[styles.menuButton, animatedStyle]}>
-              <Text style={styles.text}>PP</Text>
+              <Text style={styles.text}>{"\u2630"}</Text>
             </Animated.View>
 
           </Pressable>
@@ -85,7 +85,8 @@ const styles = StyleSheet.create({
   },
   text: {
     color: '#023020',
-    fontSize: 22,
+    fontSize: 44,
+    transform: [{ translateY: 2 }, {translateX: 2}],
   },
   content: {
     borderBlockColor: '#960018',
