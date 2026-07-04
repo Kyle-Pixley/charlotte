@@ -1,10 +1,14 @@
 import { StyleSheet, Text, View, TextInput, Pressable } from 'react-native';
-import { useState } from 'react';
+import { Dispatch, SetStateAction, useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AppText from './AppText';
 import App from '../App';
 
-function Login() {
+type LoginProps = {
+    setToken: Dispatch<SetStateAction<string | null>>;
+};
+
+function Login({setToken}: LoginProps) {
 
     const [ isRegister, setIsRegister ] = useState(false);
     const [ isSecurePasswordInput, setIsSecurePasswordInput ] = useState(true);
@@ -19,10 +23,37 @@ function Login() {
         username: 'Username',
         password: '',
 
-    })
+    });
+
+    const API_URL = process.env.EXPO_PUBLIC_API_URL;
+
+    async function handleRegister() {
+        try {
+            const response = await fetch(`${API_URL}/api/create_user/`, {
+                method: "POST",
+                headers: {
+                    "Content-Type" : "application/json",
+                },
+                body: JSON.stringify(registerInfo),
+            });
+            const data = await response.json();
+
+            if(!response.ok){
+                console.log("fail", data.error);
+                return;
+            }
+
+            console.log("User created:", data);
+            console.log("token: ",data.token);
+
+            setToken(data.token);
+        } catch(error) {
+            console.log("error" , error)
+        }
+    };
 
 
-
+// User can switch back and forth from the register form to the login form 
     function registerOrLogin() {
         if(isRegister) {
             return (
@@ -114,10 +145,15 @@ function Login() {
   return (
     <SafeAreaView style={styles.screen}>
         {registerOrLogin()}
+        <Pressable
+            onPress={() => {isRegister ? handleRegister() : null}}
+            style={styles.toggleRegisterButton}>
+            <Text style={styles.toggleRegisterText}>{isRegister ? 'Register' : 'Login'}</Text>
+        </Pressable>
         <Pressable 
             onPress={() => setIsRegister(!isRegister)}
             style={styles.toggleRegisterButton}>
-            <Text style={styles.toggleRegisterText}>{isRegister ? 'To Login' : 'To Register'}</Text>
+            <Text style={styles.toggleRegisterText}>{isRegister ? 'Login Here' : 'Register Here'}</Text>
         </Pressable>
     </SafeAreaView>
   )

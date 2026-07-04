@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { Dispatch, SetStateAction, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import MenuList from './MenuList';
 import ContentBox from './ContentBox';
@@ -6,7 +6,12 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import Animated, {useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
 
 
-function DashBoard() {
+type DashBoardProps = {
+  token: string;
+  setToken: Dispatch<SetStateAction<string | null>>;
+}
+
+function DashBoard({token, setToken}: DashBoardProps) {
 
   const [ menuList, setMenuList ] = useState(false);
 
@@ -42,6 +47,8 @@ function DashBoard() {
           <ContentBox />
         </View>
       </View>
+      //! ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++=
+      <Pressable onPress={() => setToken(null)}>logout</Pressable>
     </SafeAreaView>
   )
 }

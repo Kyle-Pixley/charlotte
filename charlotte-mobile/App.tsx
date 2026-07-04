@@ -6,13 +6,12 @@ import DashBoard from './components/DashBoard';
 
 export default function App() {
 
-  // Change to actual token 
-  const [ token, setToken ] = useState(false);
+  const [ token, setToken ] = useState<string | null>(null);
 
 
-  // useEffect(() => (
-  //   setToken(true)
-  // ), [])
+  useEffect(() => {
+    console.log('token changed', token);
+  }, [token]);
 
   return (
     <KeyboardAvoidingView
@@ -21,7 +20,7 @@ export default function App() {
     >
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View style={styles.inner}>
-          {token ? <DashBoard /> : <Login />}
+          {token ? <DashBoard token={token} /> : <Login setToken={setToken}/>}
           <StatusBar style="auto" />
         </View>
       </TouchableWithoutFeedback>
