@@ -2,7 +2,7 @@ import { StyleSheet, Text, View, TextInput, Pressable } from 'react-native';
 import { Dispatch, SetStateAction, useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AppText from './AppText';
-import App from '../App';
+import BouncePressable from './BouncePressable';
 
 type LoginProps = {
     setToken: Dispatch<SetStateAction<string | null>>;
@@ -14,20 +14,44 @@ function Login({setToken}: LoginProps) {
     const [ isSecurePasswordInput, setIsSecurePasswordInput ] = useState(true);
 
     const [ registerInfo, setRegisterInfo ] = useState({
-        username: 'Username',
-        email: 'Email',
-        password: 'Password',
+        username: '',
+        email: '',
+        password: '',
     });
 
     const [ loginInfo, setLoginInfo ] = useState({
-        username: 'Username',
+        username: '',
         password: '',
 
     });
 
     const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
+    function validPassword(password: string) {
+        const minLength = password.length >= 8;
+        const capitalLetter = /[A-Z]/.test(password);
+        const specialCharacter = /[^A-Za-z0-9]/.test(password);
+
+        if (!minLength) {
+            return "Password must consist at least 8 characters."
+        }
+        if(!capitalLetter) {
+            return "Password must contain at least 1 capital letter.";
+        }
+        if(!specialCharacter) {
+            return "Password must contain at least 1 special character.";
+        }
+        return;
+    };
+
     async function handleRegister() {
+
+        //! const passwordError = validPassword(registerInfo.password);
+        //! if(passwordError) {
+        //!     alert(passwordError)
+        //!     return;
+        //! }
+
         try {
             const response = await fetch(`${API_URL}/api/create_user/`, {
                 method: "POST",
@@ -52,6 +76,30 @@ function Login({setToken}: LoginProps) {
         }
     };
 
+    async function handleLogin() {
+        try {
+            const response = await fetch(`${API_URL}/api/login_user/`, {
+                method: "POST",
+                headers: {
+                    "Content-Type" : "application/json",
+                },
+                body: JSON.stringify(loginInfo),
+            });
+            const data = await response.json();
+
+            if(!response.ok){
+                console.log("fail", data.error);
+                return;
+            }
+            console.log("user logged in", data);
+            console.log("token: ", data.token);
+
+            setToken(data.token);
+        } catch(error) {
+            console.log("error", error)
+        }
+    };
+
 
 // User can switch back and forth from the register form to the login form 
     function registerOrLogin() {
@@ -63,6 +111,7 @@ function Login({setToken}: LoginProps) {
                         <AppText style={styles.headerText}>Username</AppText>
                         <TextInput
                             editable
+                            placeholder=''
                             onChangeText={(text) => setRegisterInfo((prev) => ({...prev,username:text}))}
                             value={registerInfo.username}
                             style={styles.textInput}
@@ -108,6 +157,7 @@ function Login({setToken}: LoginProps) {
                     <View style={styles.textInputParent}>
                         <AppText style={styles.headerText}>Username</AppText>
                         <TextInput
+                        placeholder='Your Username'
                         editable
                         onChangeText={(text) =>
                             setLoginInfo((prev) => ({ ...prev, username: text }))}
@@ -121,6 +171,7 @@ function Login({setToken}: LoginProps) {
                   
                         <View style={styles.passwordInputBox}>
                             <TextInput
+                            placeholder='********'
                             editable
                             onChangeText={(text) =>
                                 setLoginInfo((prev) => ({ ...prev, password: text }))}
@@ -145,16 +196,20 @@ function Login({setToken}: LoginProps) {
   return (
     <SafeAreaView style={styles.screen}>
         {registerOrLogin()}
-        <Pressable
-            onPress={() => {isRegister ? handleRegister() : null}}
+        <BouncePressable
+            onPress={() => {isRegister ? handleRegister() : handleLogin()}}
             style={styles.toggleRegisterButton}>
             <Text style={styles.toggleRegisterText}>{isRegister ? 'Register' : 'Login'}</Text>
-        </Pressable>
-        <Pressable 
-            onPress={() => setIsRegister(!isRegister)}
+        </BouncePressable>
+        <BouncePressable 
+            onPress={() => {
+                setTimeout(() => {
+                    setIsRegister(!isRegister);
+                },300)                
+            }}
             style={styles.toggleRegisterButton}>
             <Text style={styles.toggleRegisterText}>{isRegister ? 'Login Here' : 'Register Here'}</Text>
-        </Pressable>
+        </BouncePressable>
     </SafeAreaView>
   )
 }

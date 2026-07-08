@@ -4,6 +4,7 @@ import { StyleSheet, Text, View, KeyboardAvoidingView, TouchableWithoutFeedback,
 import Login from './components/Login';
 import DashBoard from './components/DashBoard';
 
+
 export default function App() {
 
   const [ token, setToken ] = useState<string | null>(null);
@@ -20,7 +21,7 @@ export default function App() {
     >
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View style={styles.inner}>
-          {token ? <DashBoard token={token} /> : <Login setToken={setToken}/>}
+          {token ? <DashBoard token={token} setToken={setToken}/> : <Login setToken={setToken}/>}
           <StatusBar style="auto" />
         </View>
       </TouchableWithoutFeedback>

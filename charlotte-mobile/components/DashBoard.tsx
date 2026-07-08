@@ -26,7 +26,7 @@ function DashBoard({token, setToken}: DashBoardProps) {
     <SafeAreaView style={styles.background}>
       <View style={styles.mainView}>
         <View>
-          <MenuList isOpen={menuList} />
+          <MenuList isOpen={menuList} setToken={setToken}/>
           <Pressable 
             onPress={()=> setMenuList(!menuList)}
             onPressIn={() => {
@@ -47,8 +47,7 @@ function DashBoard({token, setToken}: DashBoardProps) {
           <ContentBox />
         </View>
       </View>
-      //! ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++=
-      <Pressable onPress={() => setToken(null)}>logout</Pressable>
+      {/*//! ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++= */}
     </SafeAreaView>
   )
 }
@@ -81,7 +80,6 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     backgroundColor: "#FDA50F",
-    
   },
   header: {
     position: 'relative',

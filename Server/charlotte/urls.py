@@ -2,6 +2,8 @@ from django.urls import path
 from .views import test_api
 from . import views
 
+# todo make sure to make register need a first and last name
+
 
 urlpatterns = [
     path('test/', test_api),

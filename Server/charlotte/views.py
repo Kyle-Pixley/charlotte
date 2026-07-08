@@ -31,6 +31,9 @@ def create_user(request):
 
             hashed_password = make_password(raw_password)
 
+            if ( not username ) or (not email) or (not raw_password):
+                return JsonResponse({'error' : "Please fill out all fields"})
+
             user = User.objects.create(username=username, email=email, password=hashed_password)
             
             payload = {
