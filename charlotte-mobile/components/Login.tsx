@@ -14,13 +14,14 @@ function Login({setToken}: LoginProps) {
     const [ isSecurePasswordInput, setIsSecurePasswordInput ] = useState(true);
 
     const [ registerInfo, setRegisterInfo ] = useState({
-        username: '',
+        firstName: '',
+        lastName: '',
         email: '',
         password: '',
     });
 
     const [ loginInfo, setLoginInfo ] = useState({
-        username: '',
+        email: '',
         password: '',
 
     });
@@ -108,12 +109,22 @@ function Login({setToken}: LoginProps) {
                 <View style={styles.form}>
 
                     <View style={styles.textInputParent}>
-                        <AppText style={styles.headerText}>Username</AppText>
+                        <AppText style={styles.headerText}>First Name</AppText>
                         <TextInput
                             editable
-                            placeholder=''
-                            onChangeText={(text) => setRegisterInfo((prev) => ({...prev,username:text}))}
-                            value={registerInfo.username}
+                            placeholder='Jane'
+                            onChangeText={(text) => setRegisterInfo((prev) => ({...prev,firstName:text}))}
+                            value={registerInfo.firstName}
+                            style={styles.textInput}
+                            autoCorrect={false}/>
+                    </View>
+                    <View style={styles.textInputParent}>
+                        <AppText style={styles.headerText}>Last Name</AppText>
+                        <TextInput
+                            editable
+                            placeholder='Smith'
+                            onChangeText={(text) => setRegisterInfo((prev) => ({...prev,lastName:text}))}
+                            value={registerInfo.lastName}
                             style={styles.textInput}
                             autoCorrect={false}/>
                     </View>
@@ -155,13 +166,13 @@ function Login({setToken}: LoginProps) {
             return (
                 <View style={styles.form}>
                     <View style={styles.textInputParent}>
-                        <AppText style={styles.headerText}>Username</AppText>
+                        <AppText style={styles.headerText}>Email</AppText>
                         <TextInput
-                        placeholder='Your Username'
+                        placeholder='Your Email'
                         editable
                         onChangeText={(text) =>
-                            setLoginInfo((prev) => ({ ...prev, username: text }))}
-                        value={loginInfo.username}
+                            setLoginInfo((prev) => ({ ...prev, email: text }))}
+                        value={loginInfo.email}
                         style={styles.textInput}
                         autoCorrect={false}/>
                     </View>

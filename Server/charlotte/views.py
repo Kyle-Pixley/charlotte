@@ -1,6 +1,4 @@
 from django.shortcuts import render
-
-# Create your views here.
 import json
 from rest_framework.decorators import api_view
 from rest_framework.response import Response 
@@ -25,20 +23,22 @@ def create_user(request):
     if request.method == 'POST':
         try:
             data = json.loads(request.body)
-            username = data['username']
+            first_name = data['firstName']
+            last_name = data['lastName']
             email = data['email']
             raw_password = data['password']
 
             hashed_password = make_password(raw_password)
 
-            if ( not username ) or (not email) or (not raw_password):
+            if ( not first_name ) or (not last_name) or (not email) or (not raw_password):
                 return JsonResponse({'error' : "Please fill out all fields"})
 
-            user = User.objects.create(username=username, email=email, password=hashed_password)
+            user = User.objects.create(first_name=first_name, last_name=last_name, email=email, password=hashed_password)
             
             payload = {
                 'user_id' : user.id,
-                'username' : user.username,
+                'first_name' : first_name,
+                'last_name' : last_name,
                 'exp' : datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(seconds=settings.JWT_EXP_DELTA_SECONDS)
             }
             token = jwt.encode(payload, settings.JWT_SECRET, algorithm=settings.JWT_ALGORITHM)
@@ -59,23 +59,23 @@ def login_user(request):
     if request.method == "POST":
         try:
             data = json.loads(request.body)
-            input_username = data.get('username')
+            email = data.get('email')
             input_password = data.get('password')
 
-            if (not input_username) or (not input_password):
-                return JsonResponse({ 'error' : 'Please provide User Name and Password'}, status=400)
+            if (not email) or (not input_password):
+                return JsonResponse({ 'error' : 'Please provide Email and Password'}, status=400)
 
             try:
-                found_user = User.objects.get(username = input_username)
+                found_user = User.objects.get(email = email)
             except User.DoesNotExist:
-                return JsonResponse({'error' : 'Incorrect User Name'}, status=404)
+                return JsonResponse({'error' : 'Incorrect Email'}, status=404)
 
             if not check_password(input_password, found_user.password):
                 return JsonResponse({'error' : 'Password incorrect'}, status=401)
             
             payload = {
                 'user_id' : found_user.id,
-                'username' : found_user.username,
+                'email' : found_user.email,
                 'exp' : datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(seconds=settings.JWT_EXP_DELTA_SECONDS)
             }
             token = jwt.encode(payload, settings.JWT_SECRET, algorithm=settings.JWT_ALGORITHM)

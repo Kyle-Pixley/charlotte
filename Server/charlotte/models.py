@@ -4,7 +4,8 @@ from django.db import models
 
 #User Model
 class User(models.Model):
-    username = models.CharField(max_length=50, unique=True)
+    first_name = models.CharField(max_length=50, unique=False)
+    last_name = models.CharField(max_length=50, unique=False)
     email = models.EmailField(unique=True)
     password = models.CharField(max_length=100)
     groups = models.ManyToManyField('self', blank=True)
