@@ -2,13 +2,21 @@ import React, { useEffect, useState, Dispatch, SetStateAction } from 'react';
 import AppText from './AppText';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
+import type { RootStackParamList } from '../App';
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 type MenuListProps = { 
   isOpen: boolean;
     setToken: Dispatch<SetStateAction<string | null>>;
   };
 
+type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
+
+
 function MenuList({isOpen, setToken} : MenuListProps) {
+
+  const navigation = useNavigation<NavigationProp>();
 
   const slideX = useSharedValue(-330);
 
@@ -26,7 +34,9 @@ function MenuList({isOpen, setToken} : MenuListProps) {
 
   return (
     <Animated.View style={[styles.menulist, animatedStyle]}>
-        <AppText>Menu List</AppText>
+        <Pressable onPress={() => navigation.navigate("CreateRoom")}>
+          <AppText>Create Room</AppText>
+        </Pressable>
         <Pressable 
             style={styles.logoutButton}
             onPress={() => setToken(null)}>

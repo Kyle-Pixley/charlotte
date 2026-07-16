@@ -1,8 +1,19 @@
 import { useState, useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, KeyboardAvoidingView, TouchableWithoutFeedback, Platform, Keyboard } from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Login from './components/Login';
 import DashBoard from './components/DashBoard';
+import CreateRoom from './components/CreateRoom';
+
+export type RootStackParamList = {
+  DashBoard: undefined;
+  CreateRoom: undefined;
+  Login: undefined;
+}
+
+const Stack = createNativeStackNavigator<RootStackParamList>();
 
 
 export default function App() {
@@ -22,10 +33,23 @@ export default function App() {
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <View style={styles.inner}>
-          {token ? <DashBoard token={token} setToken={setToken}/> : <Login setToken={setToken}/>}
-          <StatusBar style="auto" />
-        </View>
+        <NavigationContainer>
+      <Stack.Navigator screenOptions={{ headerShown: false }}>
+        {token ? (
+          <>
+            <Stack.Screen name="DashBoard">
+              {() => <DashBoard token={token} setToken={setToken} />}
+            </Stack.Screen>
+
+            <Stack.Screen name="CreateRoom" component={CreateRoom} />
+          </>
+        ) : (
+          <Stack.Screen name="Login">
+            {() => <Login setToken={setToken} />}
+          </Stack.Screen>
+        )}
+      </Stack.Navigator>
+    </NavigationContainer>
       </TouchableWithoutFeedback>
     </KeyboardAvoidingView>
   );

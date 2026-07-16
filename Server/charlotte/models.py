@@ -16,7 +16,7 @@ class User(models.Model):
 
 
 class ChatRoom(models.Model):
-    name = models.CharField(max_length=100, blank=True, null=True)
+    name = models.CharField(max_length=100, blank=True, null=True, unique=True)
 
     admin = models.ForeignKey(
         User,
