@@ -7,7 +7,9 @@ import DashBoard from './components/DashBoard';
 
 export default function App() {
 
-  const [ token, setToken ] = useState<string | null>(null);
+  const DEV_TOKEN = process.env.EXPO_PUBLIC_DEV_TOKEN ?? null;
+
+  const [ token, setToken ] = useState<string | null>(DEV_TOKEN);
 
 
   useEffect(() => {

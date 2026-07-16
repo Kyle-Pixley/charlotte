@@ -3,9 +3,18 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import AppText from './AppText';
 
 function ContentBox() {
+
+
+  const [ conversation, setConversation ] = useState('')
+
+  function name() {
+    
+  }
+
+
   return (
     <View style={styles.mainView}>
-      <Text>Content box</Text>
+      
     </View>
   )
 }
