@@ -26,7 +26,7 @@ function DashBoard({token, setToken}: DashBoardProps) {
     <SafeAreaView style={styles.background}>
       <View style={styles.mainView}>
         <View>
-          <MenuList isOpen={menuList} setToken={setToken}/>
+          <MenuList isOpen={menuList} token={token} setToken={setToken}/>
           <Pressable 
             onPress={()=> setMenuList(!menuList)}
             onPressIn={() => {

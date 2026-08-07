@@ -8,13 +8,14 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 type MenuListProps = { 
   isOpen: boolean;
+  token: string;
     setToken: Dispatch<SetStateAction<string | null>>;
   };
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
 
-function MenuList({isOpen, setToken} : MenuListProps) {
+function MenuList({isOpen, token, setToken} : MenuListProps) {
 
   const navigation = useNavigation<NavigationProp>();
 
@@ -34,7 +35,7 @@ function MenuList({isOpen, setToken} : MenuListProps) {
 
   return (
     <Animated.View style={[styles.menulist, animatedStyle]}>
-        <Pressable onPress={() => navigation.navigate("CreateRoom")}>
+        <Pressable onPress={() => navigation.navigate("CreateRoom" , { token })}>
           <AppText>Create Room</AppText>
         </Pressable>
         <Pressable 

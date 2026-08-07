@@ -9,7 +9,9 @@ import CreateRoom from './components/CreateRoom';
 
 export type RootStackParamList = {
   DashBoard: undefined;
-  CreateRoom: undefined;
+  CreateRoom: {
+    token: string;
+  };
   Login: undefined;
 }
 

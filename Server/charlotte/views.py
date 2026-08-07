@@ -39,6 +39,7 @@ def create_user(request):
                 'user_id' : user.id,
                 'first_name' : first_name,
                 'last_name' : last_name,
+                'email' : email,
                 'exp' : datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(seconds=settings.JWT_EXP_DELTA_SECONDS)
             }
             token = jwt.encode(payload, settings.JWT_SECRET, algorithm=settings.JWT_ALGORITHM)

@@ -1,21 +1,44 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, KeyboardAvoidingView, TouchableWithoutFeedback, Platform, Keyboard, Pressable } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import BouncePressable from './BouncePressable';
 import AppText from './AppText';
 
-import { useNavigation } from "@react-navigation/native";
-import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { jwtDecode } from "jwt-decode";
+import { useNavigation, useRoute } from "@react-navigation/native";
+import type { NativeStackNavigationProp, NativeStackScreenProps } from "@react-navigation/native-stack";
 import type { RootStackParamList } from "../App";
+
+type CreateRoomRouteProp = NativeStackScreenProps<
+  RootStackParamList,
+  "CreateRoom"
+>["route"];
+
+type TokenPayload = {
+  user_id: number;
+  username: string;
+  email: string;
+  exp: number;
+}
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
 function CreateRoom() {
+  
+  
+  const navigation = useNavigation<NavigationProp>();
+  const route = useRoute<CreateRoomRouteProp>();
+  
+  const { token } = route.params;
+  const userInfo = jwtDecode<TokenPayload>(token);
 
-    const navigation = useNavigation<NavigationProp>();
+    useEffect(() => {
+      console.log(userInfo.email, 'create room token')
+    }, [token])
 
     const [ roomInfo, setRoomInfo ] = useState({
         name: '',
+        admin: '',
     });
 
   return (
