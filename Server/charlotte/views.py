@@ -167,6 +167,9 @@ def create_chatroom(request):
         if not admin_id:
             return JsonResponse({"error" : "admin_id is required"}, status=400)
 
+        if ChatRoom.objects.filter(name=name).exists():
+            return JsonResponse({"error": "A room with that name already exists"}, status=400)
+
         try:
             admin = User.objects.get(id=admin_id)
         except User.DoesNotExist:

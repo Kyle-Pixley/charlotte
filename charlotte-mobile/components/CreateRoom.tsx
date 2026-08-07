@@ -41,6 +41,8 @@ function CreateRoom() {
         admin_id: userInfo.user_id,
     });
 
+    const [ roomCreated, setRoomCreated ] = useState('')
+
     const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
     async function handleCreateChatRoom() {
@@ -56,8 +58,10 @@ function CreateRoom() {
 
             if(!response.ok){
                 console.log("fail", data.error);
+                setRoomCreated(data.error)
                 return;
             }
+            setRoomCreated('Room Created')
             console.log('room created', data)
         } catch(error) {
             console.log("error", error)
@@ -87,6 +91,9 @@ function CreateRoom() {
                     style={styles.toggleCreateRoomButton}>
                     <Text style={styles.toggleCreateRoomText}>Create Room</Text>
                   </BouncePressable>
+                  <View>
+                    <Text>{roomCreated}</Text>
+                  </View>
                 </View>
         </KeyboardAvoidingView>
     </SafeAreaView>
