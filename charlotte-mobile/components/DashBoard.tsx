@@ -1,4 +1,4 @@
-import React, { Dispatch, SetStateAction, useState } from 'react';
+import React, { Dispatch, SetStateAction, useState, useEffect } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import MenuList from './MenuList';
 import ContentBox from './ContentBox';
@@ -11,9 +11,10 @@ type DashBoardProps = {
   setToken: Dispatch<SetStateAction<string | null>>;
 }
 
-function DashBoard({token, setToken}: DashBoardProps) {
+function DashBoard({token, setToken} : DashBoardProps) {
 
   const [ menuList, setMenuList ] = useState(false);
+  const [ currentRoom, setCurrentRoom ] = useState<number>(0);
 
   const scale = useSharedValue(1);
   const animatedStyle = useAnimatedStyle(() => {
@@ -26,7 +27,13 @@ function DashBoard({token, setToken}: DashBoardProps) {
     <SafeAreaView style={styles.background}>
       <View style={styles.mainView}>
         <View>
-          <MenuList isOpen={menuList} token={token} setToken={setToken}/>
+          <MenuList 
+            isOpen={menuList} 
+            token={token} 
+            setToken={setToken} 
+            currentRoom={currentRoom} 
+            setCurrentRoom={setCurrentRoom}/>
+
           <Pressable 
             onPress={()=> setMenuList(!menuList)}
             onPressIn={() => {

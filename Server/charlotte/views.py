@@ -90,6 +90,62 @@ def login_user(request):
 
     else: 
         return JsonResponse({'error' : 'Only POST method allowed'}, status=405)
+
+
+#Get Groups User Belongs To
+@csrf_exempt
+def get_user_groups(request):
+    if request.method != "GET":
+        return JsonResponse({"error" : "Needs to be GET request"}, status=405)
+    
+    auth_header = request.headers.get("Authorization")
+
+    if not auth_header:
+        return JsonResponse({"error" : "Missing Authorization header"}, status=401)
+
+    try:
+        token_type, token = auth_header.split(" ")
+
+        if token_type.lower() != "bearer":
+            return JsonResponse({"error": "invalid token type"}, status=401)
+
+        payload = jwt.decode(
+            token,
+            settings.JWT_SECRET,
+            algorithms=[settings.JWT_ALGORITHM]
+        )
+
+        user_id = payload.get("user_id")
+
+        if not user_id:
+            return JsonResponse({"error" : "Invalid token payload"}, status=401)
+
+        user = User.objects.get(id=user_id)
+
+        rooms = user.chatrooms.all()
+
+        room_data = []
+
+        for room in rooms:
+            room_data.append({
+                "id":room.id,
+                "name": room.name,
+                "admin_id": room.admin.id,
+            })
+        
+        return JsonResponse({ "groups" : room_data }, status=200)
+
+    except jwt.ExpiredSignatureError:
+        return JsonResponse({"error" : "expired token"}, status=401)
+
+    except jwt.InvalidTokenError:
+        return JsonResponse({ "error" : "Invalid Token"}, status=401)
+
+    except User.DoesNotExist:
+        return JsonResponse({"error" : "User not found"}, status=404)
+
+    except ValueError:
+        return JsonResponse({"error" : "Invalid Authorization Header"}, status=401)
     
 #Finds User by ID
 @csrf_exempt

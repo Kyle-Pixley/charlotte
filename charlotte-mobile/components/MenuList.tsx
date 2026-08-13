@@ -9,15 +9,52 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 type MenuListProps = { 
   isOpen: boolean;
   token: string;
-    setToken: Dispatch<SetStateAction<string | null>>;
+  setToken: Dispatch<SetStateAction<string | null>>;
+  currentRoom: number;
+  setCurrentRoom: React.Dispatch<React.SetStateAction<number>>;
   };
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
 
-function MenuList({isOpen, token, setToken} : MenuListProps) {
+function MenuList({isOpen, token, setToken, currentRoom, setCurrentRoom} : MenuListProps) {
 
   const navigation = useNavigation<NavigationProp>();
+
+  type Group = {
+    id: number;
+    name: string | null;
+    admin_id: number;
+  }
+
+  const [groups, setGroups] = useState<Group[]>([]);
+
+  useEffect(() => {
+    async function getGroups() {
+      try{
+        const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/api/get_user_groups/`, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        const data = await response.json();
+
+        if (!response.ok) {
+          console.log("error getting groups:", data);
+          return;
+        }
+
+        setGroups(data.groups);
+
+      } catch(error) {
+        console.log("Fetch groups error:", error);
+      }
+    }
+    if (token) {
+      getGroups();
+    }
+  }, [token]);
 
   const slideX = useSharedValue(-330);
 
@@ -38,6 +75,17 @@ function MenuList({isOpen, token, setToken} : MenuListProps) {
         <Pressable onPress={() => navigation.navigate("CreateRoom" , { token })}>
           <AppText>Create Room</AppText>
         </Pressable>
+        <Pressable>
+        </Pressable>
+        
+        {groups.map((group) => (
+          <Pressable 
+            key={group.id} 
+            onPress={() => setCurrentRoom(group.id)}>
+            <AppText>{group.name ?? ` Group${group.id}`}</AppText>    
+          </Pressable>
+        ))}
+
         <Pressable 
             style={styles.logoutButton}
             onPress={() => setToken(null)}>

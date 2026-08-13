@@ -8,11 +8,10 @@ class User(models.Model):
     last_name = models.CharField(max_length=50, unique=False)
     email = models.EmailField(unique=True)
     password = models.CharField(max_length=100)
-    groups = models.ManyToManyField('self', blank=True)
     friends = models.ManyToManyField('self', blank=True)
 
     def __str__(self):
-        return self.username
+        return f"{self.first_name} {self.last_name}"
 
 
 class ChatRoom(models.Model):
@@ -26,14 +25,14 @@ class ChatRoom(models.Model):
 
     participants = models.ManyToManyField(
         User, 
-        related_name="chatrooms")
+        related_name="chatrooms",
+        blank=True
+    )
 
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        if self.name:
-            return self.name
-        return f"ChatRoom {self.id}"
+        return self.name or f"ChatRoom {self.id}"
 
 class ChatRoomJoinRequest(models.Model):
     chatroom = models.ForeignKey(
