@@ -51,7 +51,7 @@ function DashBoard({token, setToken} : DashBoardProps) {
           <Text style={styles.header}>Charlotte</Text>
         </View>
         <View style={styles.content}>
-          <ContentBox />
+          <ContentBox token={token} currentRoom={currentRoom} />
         </View>
       </View>
       {/*//! ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++= */}

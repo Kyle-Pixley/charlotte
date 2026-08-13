@@ -385,6 +385,13 @@ def create_room_message(request):
         except ChatRoom.DoesNotExist:
             return JsonResponse({"error" : "chatroom does not exist"}, status=404)
 
+        print("POST sender_id:", sender_id)
+        print("POST chatroom_id:", chatroom_id)
+        print("sender.id:", sender.id)
+        print("chatroom.id:", chatroom.id)
+        print("participants:", list(chatroom.participants.values_list("id", "first_name", "last_name", "email")))
+        print("exists check:", chatroom.participants.filter(id=sender.id).exists())
+
         if not chatroom.participants.filter(id=sender.id).exists():
             return JsonResponse({"error" : "user not included in room"},status=403)
 
@@ -400,7 +407,8 @@ def create_room_message(request):
             "room_message": {
                 "id" : message.id,
                 "sender_id" : message.sender_id,
-                "sender_username" : message.sender.username,
+                "sender_first_name" : message.sender.first_name,
+                "sender_last_name" : message.sender.last_name,
                 "chatroom_id" : message.chatroom_id,
                 "body" : message.body,
                 "is_system_message" : message.is_system_message,
@@ -410,3 +418,70 @@ def create_room_message(request):
 
     except json.JSONDecodeError:
         return JsonResponse({"error":"Invalid JSON"}, status=400)
+
+#Get all messages from a room
+def get_room_messages(request, room_id):
+    if request.method != "GET":
+        return JsonResponse({"error": "Needs to be GET request"}, status=405)
+
+    auth_header = request.headers.get("Authorization")
+
+    if not auth_header:
+        return JsonResponse({"error": "Missing Authorization header"}, status=401)
+
+    try:
+        token_type, token = auth_header.split(" ")
+
+        if token_type.lower() != "bearer":
+            return JsonResponse({"error": "Invalid token type"}, status=401)
+
+        payload = jwt.decode(
+            token,
+            settings.JWT_SECRET,
+            algorithms=[settings.JWT_ALGORITHM]
+        )
+
+        user = User.objects.get(id=payload["user_id"])
+        room = ChatRoom.objects.get(id=room_id)
+
+        if not room.participants.filter(id=user.id).exists():
+            return JsonResponse({"error": "User is not in this room"}, status=403)
+
+        messages = Message.objects.filter(
+            chatroom=room
+        ).select_related("sender").order_by("timestamp")
+
+        message_data = []
+
+        for message in messages:
+            message_data.append({
+                "id": message.id,
+                "sender_id": message.sender.id,
+                "sender_name": str(message.sender),
+                "body": message.body,
+                "is_system_message": message.is_system_message,
+                "timestamp": message.timestamp.isoformat(),
+            })
+
+        return JsonResponse({
+            "room": {
+                "id": room.id,
+                "name": room.name,
+            },
+            "messages": message_data,
+        }, status=200)
+
+    except jwt.ExpiredSignatureError:
+        return JsonResponse({"error": "Expired token"}, status=401)
+
+    except jwt.InvalidTokenError:
+        return JsonResponse({"error": "Invalid token"}, status=401)
+
+    except User.DoesNotExist:
+        return JsonResponse({"error": "User not found"}, status=404)
+
+    except ChatRoom.DoesNotExist:
+        return JsonResponse({"error": "Room not found"}, status=404)
+
+    except ValueError:
+        return JsonResponse({"error": "Invalid Authorization header"}, status=401)

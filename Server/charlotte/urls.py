@@ -15,5 +15,6 @@ urlpatterns = [
     path('request_to_join_chatroom/', views.request_to_join_chatroom),
     path('approve_join_request/', views.approve_join_request),
     path('create_room_message/', views.create_room_message),
+    path('get_room_messages/<int:room_id>/', views.get_room_messages),
     path('get_user_groups/', views.get_user_groups),
 ]
