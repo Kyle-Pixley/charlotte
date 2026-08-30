@@ -21,8 +21,10 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 export default function App() {
 
   const DEV_TOKEN = process.env.EXPO_PUBLIC_DEV_TOKEN ?? null;
+  //!! might need DEV_USER_ID
 
   const [ token, setToken ] = useState<string | null>(DEV_TOKEN);
+  const [ currentUserId, setCurrentUserId ] = useState<number | null>(null);
 
 
   useEffect(() => {
@@ -37,17 +39,23 @@ export default function App() {
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
-        {token ? (
+        {token !== null && currentUserId !== null ? (
           <>
             <Stack.Screen name="DashBoard">
-              {() => <DashBoard token={token} setToken={setToken} />}
+              {() => <DashBoard 
+                        token={token} 
+                        setToken={setToken} 
+                        currentUserId={currentUserId}
+                        setCurrentUserId={setCurrentUserId}/>}
             </Stack.Screen>
 
             <Stack.Screen name="CreateRoom" component={CreateRoom} />
           </>
         ) : (
           <Stack.Screen name="Login">
-            {() => <Login setToken={setToken} />}
+            {() => <Login 
+                      setToken={setToken} 
+                      setCurrentUserId={setCurrentUserId}/>}
           </Stack.Screen>
         )}
       </Stack.Navigator>

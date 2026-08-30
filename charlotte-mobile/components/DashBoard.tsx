@@ -9,9 +9,11 @@ import Animated, {useSharedValue, useAnimatedStyle, withTiming } from 'react-nat
 type DashBoardProps = {
   token: string;
   setToken: Dispatch<SetStateAction<string | null>>;
+  currentUserId: number;
+  setCurrentUserId: Dispatch<SetStateAction<number | null>>;
 }
 
-function DashBoard({token, setToken} : DashBoardProps) {
+function DashBoard({ token, setToken, currentUserId, setCurrentUserId } : DashBoardProps) {
 
   const [ menuList, setMenuList ] = useState(false);
   const [ currentRoom, setCurrentRoom ] = useState<number>(0);
@@ -32,7 +34,8 @@ function DashBoard({token, setToken} : DashBoardProps) {
             token={token} 
             setToken={setToken} 
             currentRoom={currentRoom} 
-            setCurrentRoom={setCurrentRoom}/>
+            setCurrentRoom={setCurrentRoom}
+            setCurrentUserId={setCurrentUserId}/>
 
           <Pressable 
             onPress={()=> setMenuList(!menuList)}
@@ -51,7 +54,10 @@ function DashBoard({token, setToken} : DashBoardProps) {
           <Text style={styles.header}>Charlotte</Text>
         </View>
         <View style={styles.content}>
-          <ContentBox token={token} currentRoom={currentRoom} />
+          <ContentBox 
+            token={token} 
+            currentRoom={currentRoom} 
+            currentUserId={currentUserId}/>
         </View>
       </View>
       {/*//! ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++= */}

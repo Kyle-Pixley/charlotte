@@ -44,7 +44,14 @@ def create_user(request):
             }
             token = jwt.encode(payload, settings.JWT_SECRET, algorithm=settings.JWT_ALGORITHM)
 
-            return JsonResponse({'message' : 'User Created Successfully', 'user_id' : user.id, 'token' : token}, status=201)
+            return JsonResponse({
+                'message' : 'User Created Successfully', 
+                'user_id' : user.id, 
+                'token' : token,
+                "user" : {
+                    "id" : user.id,
+                    "email" : user.email,
+                }}, status=201)
 
         except KeyError:
             return JsonResponse({'error' : 'Missing required fields'}, status=400)
@@ -81,7 +88,11 @@ def login_user(request):
             }
             token = jwt.encode(payload, settings.JWT_SECRET, algorithm=settings.JWT_ALGORITHM)
 
-            return JsonResponse({'message' : 'User Logged in Successfully', 'token' : token}, status=200)
+            return JsonResponse({'message' : 'User Logged in Successfully', 'token' : token, 
+                "user" : {
+                    "id" : found_user.id,
+                    "email" : found_user.email
+                }}, status=200)
         
         except json.JSONDecodeError:
             return JsonResponse({'error' : 'Invalid JSON'}, status=400)

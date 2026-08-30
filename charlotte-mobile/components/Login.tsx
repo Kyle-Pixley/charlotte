@@ -6,9 +6,10 @@ import BouncePressable from './BouncePressable';
 
 type LoginProps = {
     setToken: Dispatch<SetStateAction<string | null>>;
+    setCurrentUserId: Dispatch<SetStateAction<number |null>>;
 };
 
-function Login({setToken}: LoginProps) {
+function Login({ setToken, setCurrentUserId }: LoginProps) {
 
     const [ isRegister, setIsRegister ] = useState(false);
     const [ isSecurePasswordInput, setIsSecurePasswordInput ] = useState(true);
@@ -72,6 +73,7 @@ function Login({setToken}: LoginProps) {
             console.log("token: ",data.token);
 
             setToken(data.token);
+            setCurrentUserId(data.user.id);
         } catch(error) {
             console.log("error" , error)
         }
@@ -96,6 +98,7 @@ function Login({setToken}: LoginProps) {
             console.log("token: ", data.token);
 
             setToken(data.token);
+            setCurrentUserId(data.user.id);
         } catch(error) {
             console.log("error", error)
         }

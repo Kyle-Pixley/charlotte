@@ -17,6 +17,7 @@ type MenuListProps = {
   setToken: Dispatch<SetStateAction<string | null>>;
   currentRoom: number;
   setCurrentRoom: Dispatch<SetStateAction<number>>;
+  setCurrentUserId: Dispatch<SetStateAction<number | null>>;
 };
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
@@ -27,6 +28,7 @@ function MenuList({
   setToken,
   currentRoom,
   setCurrentRoom,
+  setCurrentUserId,
 }: MenuListProps) {
   const navigation = useNavigation<NavigationProp>();
 
@@ -44,6 +46,10 @@ function MenuList({
     };
   });
 
+  const handleLogout = () => {
+    setCurrentUserId(null);
+    setToken(null);
+  }
   return (
     <Animated.View style={[styles.menulist, animatedStyle]}>
       <Pressable onPress={() => navigation.navigate("CreateRoom", { token })}>
@@ -63,7 +69,7 @@ function MenuList({
         setCurrentRoom={setCurrentRoom}
       />
 
-      <Pressable style={styles.logoutButton} onPress={() => setToken(null)}>
+      <Pressable style={styles.logoutButton} onPress={() => handleLogout()}>
         <AppText>logout</AppText>
       </Pressable>
     </Animated.View>

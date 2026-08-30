@@ -5,6 +5,7 @@ import AppText from "./AppText";
 type ContentBoxProps = {
   token: string;
   currentRoom: number;
+  currentUserId: number;
 };
 
 type Message = {
@@ -16,7 +17,7 @@ type Message = {
   timestamp: string;
 };
 
-function ContentBox({ token, currentRoom }: ContentBoxProps) {
+function ContentBox({ token, currentRoom, currentUserId }: ContentBoxProps) {
   const [conversation, setConversation] = useState<Message[]>([]);
   const [roomName, setRoomName] = useState<string | null>(null);
 
@@ -72,23 +73,28 @@ function ContentBox({ token, currentRoom }: ContentBoxProps) {
 
           <ScrollView style={styles.messagesBox}>
             {conversation.length > 0 ? (
-              conversation.map((message) => (
+              conversation.map((message) => { 
+
+                const isUserMessage = message.sender_id === currentUserId;
+
+                return (
                 <View
                   key={message.id}
                   style={[
                     styles.messageBubble,
                     message.is_system_message && styles.systemMessage,
+                    isUserMessage && styles.userMessage
                   ]}
                 >
                   {!message.is_system_message && (
-                    <AppText>{message.sender_name}</AppText>
+                    <AppText style={[styles.messageSender]}>{message.sender_name}</AppText>
                   )}
 
-                  <AppText>{message.body}</AppText>
+                  <AppText style={styles.messageBody}>{message.body}</AppText>
                 </View>
-              ))
+              )})
             ) : (
-              <AppText>No messages yet</AppText>
+              <AppText>No Messages</AppText>
             )}
           </ScrollView>
         </>
@@ -123,6 +129,18 @@ const styles = StyleSheet.create({
     borderColor: "#960018",
     padding: 8,
     marginBottom: 8,
+  },
+  messageSender: {
+    fontSize: 22,
+    marginBottom: 22,
+    color: "#960018",
+    fontWeight: "600",
+  },
+  userMessage: {
+    alignItems: 'flex-end',
+  },
+  messageBody: {
+    fontSize: 22
   },
   systemMessage: {
     backgroundColor: "#eeeeee",
